@@ -803,41 +803,37 @@ local function findNearestEnemy()
     return nearestEnemy
 end
 
--- The toggle logic, which will be called by the UI.
-Section:NewToggle("Auto Farm Nearest Enemy Fastest", "Finds, teleports to, and defeats the nearest enemy.", function(state)
-    isEnabled = state
-    if state then
-        print("✅ Auto Farm enabled.")
-        -- Start the auto-farm loop in a new thread
-        spawn(function()
-            while isEnabled do
-                local nearestEnemy = findNearestEnemy()
+local isFarming = false
 
-                if nearestEnemy and nearestEnemy.Humanoid and nearestEnemy.HumanoidRootPart then
-                    print("🎯 Found nearest enemy: " .. nearestEnemy.Name .. ". Attacking!")
-                    
-                    -- Teleport the character a short distance away from the current enemy
-                    local teleportPosition = nearestEnemy.HumanoidRootPart.Position + (lplr.Character.HumanoidRootPart.Position - nearestEnemy.HumanoidRootPart.Position).Unit * 5
-                    lplr.Character.HumanoidRootPart.CFrame = CFrame.new(teleportPosition)
-                    
-                    -- Continuously attack this enemy until it is defeated
-                    while isEnabled and nearestEnemy and nearestEnemy.Parent and nearestEnemy.Humanoid.Health > 0 do
-                         local args = {
-                            {}
-                        }
-                        PlayerClickAttackSkill:FireServer(unpack(args))
-                        task.wait(0.1) -- Small delay between attacks
-                    end
-                else
-                    print("❌ No enemies found. Waiting...")
-                    task.wait(1)
-                end
-            end
-            print("❌ Auto Farm was disabled.")
-        end)
+-- This is the code for the UI toggle
+Section:NewToggle("Autofarm Fast", "Turns on/off the autofarm.", function(state)
+    isFarming = state
+    if state then
+        print("Autofarm is ON")
     else
-        isEnabled = false
-        print("❌ Toggle Off")
+        print("Autofarm is OFF")
     end
 end)
-```eof
+
+-- The main script loop
+while true do
+    -- Only run the farming logic if the toggle is on
+    if isFarming then
+        -- Your existing autofarm code would go here
+        -- ...
+        local enemies = workspace.Enemys:GetChildren()
+        for _, enemy in ipairs(enemies) do
+            if enemy:IsA("Model") and enemy:FindFirstChild("Humanoid") and enemy.Humanoid.Health > 0 and enemy:FindFirstChild("HumanoidRootPart") then
+                local teleportPosition = enemy.HumanoidRootPart.Position + (lplr.Character.HumanoidRootPart.Position - enemy.HumanoidRootPart.Position).Unit * 5
+                lplr.Character.HumanoidRootPart.CFrame = CFrame.new(teleportPosition)
+                task.wait(0.2)
+                PlayerClickAttackSkill:FireServer(enemy)
+                task.wait(0.1)
+            end
+        end
+        task.wait(1)
+    else
+        -- Wait a moment to prevent the script from using too much power when the toggle is off
+        task.wait(0.5)
+    end
+end
