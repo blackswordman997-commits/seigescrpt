@@ -759,3 +759,85 @@ Section:NewToggle("Auto Farm Nearest Enemy", "Continuously farms the nearest ene
         print("❌ Auto Farm disabled.")
     end
 end)
+
+-- This script combines an auto-farm loop with a toggle switch.
+local isEnabled = false
+
+-- Services and variables
+local Players = game:GetService("Players")
+local lplr = Players.LocalPlayer
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Remotes = ReplicatedStorage:WaitForChild("Remotes")
+
+-- Remote event for attacking
+local PlayerClickAttackSkill = Remotes:WaitForChild("PlayerClickAttackSkill")
+
+-- The function to find the nearest enemy
+local function findNearestEnemy()
+    local nearestEnemy = nil
+    local shortestDistance = math.huge
+    
+    local enemysFolder = game.Workspace:FindFirstChild("Enemys")
+    if not enemysFolder then
+        return nil
+    end
+
+    -- Get a list of all potential targets
+    for _, child in pairs(enemysFolder:GetChildren()) do
+        local humanoid = child:FindFirstChild("Humanoid")
+        local humanoidRootPart = child:FindFirstChild("HumanoidRootPart")
+        
+        if humanoid and humanoidRootPart and humanoid.Health > 0 then
+            local character = humanoid.Parent
+            local isPlayer = Players:GetPlayerFromCharacter(character)
+            if not isPlayer and character ~= lplr.Character then
+                local distance = (humanoidRootPart.Position - lplr.Character.HumanoidRootPart.Position).Magnitude
+                if distance < shortestDistance then
+                    shortestDistance = distance
+                    nearestEnemy = child
+                end
+            end
+        end
+    end
+
+    return nearestEnemy
+end
+
+-- The toggle logic, which will be called by the UI.
+Section:NewToggle("Auto Farm Nearest Enemy Fastest", "Finds, teleports to, and defeats the nearest enemy.", function(state)
+    isEnabled = state
+    if state then
+        print("✅ Auto Farm enabled.")
+        -- Start the auto-farm loop in a new thread
+        spawn(function()
+            while isEnabled do
+                local nearestEnemy = findNearestEnemy()
+
+                if nearestEnemy and nearestEnemy.Humanoid and nearestEnemy.HumanoidRootPart then
+                    print("🎯 Found nearest enemy: " .. nearestEnemy.Name .. ". Attacking!")
+                    
+                    -- Teleport the character a short distance away from the current enemy
+                    local teleportPosition = nearestEnemy.HumanoidRootPart.Position + (lplr.Character.HumanoidRootPart.Position - nearestEnemy.HumanoidRootPart.Position).Unit * 5
+                    lplr.Character.HumanoidRootPart.CFrame = CFrame.new(teleportPosition)
+                    
+                    -- Continuously attack this enemy until it is defeated
+                    while isEnabled and nearestEnemy and nearestEnemy.Parent and nearestEnemy.Humanoid.Health > 0 do
+                         local args = {
+                            {}
+                        }
+                        PlayerClickAttackSkill:FireServer(unpack(args))
+                        task.wait(0.1) -- Small delay between attacks
+                    end
+                else
+                    print("❌ No enemies found. Waiting...")
+                    task.wait(1)
+                end
+            end
+            print("❌ Auto Farm was disabled.")
+        end)
+    else
+        isEnabled = false
+        print("❌ Toggle Off")
+    end
+end)
+```eof
