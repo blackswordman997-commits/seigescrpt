@@ -5,7 +5,7 @@ local Remotes = ReplicatedStorage:WaitForChild("Remotes")
 while true do
     -- Action 1: Wait 1.5 hour before teleporting to world 10
     print("Waiting 1.5 hour before teleporting to World 10...")
-    task.wait(5400) -- Corrected from 6000, as 1.5 hours is 5400 seconds
+    task.wait(5580) -- Corrected from 6000, as 1.5 hours is 5400 seconds
 
     -- Teleportation to World 10 (mapId = 50010)
     print("Teleporting to World 10...")
