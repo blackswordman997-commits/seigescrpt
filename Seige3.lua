@@ -19,9 +19,9 @@ while true do
     print("Teleporting to Monster Siege 3...")
     Remotes:WaitForChild("EnterCityRaidMap"):FireServer(1000003)
 
-    -- Action 3: Wait 50 seconds before teleporting to World 10
-    print("Teleported. Waiting 50 seconds before teleporting to World 10...")
-    task.wait(50)
+    -- Action 3: Wait 600 seconds before teleporting to World 10
+    print("Teleported. Waiting 600 seconds before teleporting to World 10...")
+    task.wait(600)
 
     -- Teleportation to World 10 (mapId = 50010)
     print("Teleporting to World 10...")
