@@ -1,3 +1,5 @@
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
+local Window = Library.CreateLib("ASH X HUB", "BloodTheme")
 local Tab = Window:NewTab("AUTO")
 local Section = Tab:NewSection("RAID")
 -- Toggles the script on or off. This is now controlled by the UI toggle.
