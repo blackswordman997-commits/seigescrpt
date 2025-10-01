@@ -15,10 +15,9 @@ while true do
             mapId = 50010
         }
     }
+    -- ENSURE LocalPlayerTeleport is READY before firing
     Remotes:WaitForChild("LocalPlayerTeleport"):FireServer(unpack(args1))
 
-    -- CRITICAL SAFETY WAIT: Wait 5 seconds for the client to stabilize after teleport
-    wait(5) 
     
     -- Action 2: Wait 20 seconds before teleporting to monster siege 3
     print("Teleported. Waiting 20 seconds before teleporting to Monster Siege 3...")
@@ -29,10 +28,9 @@ while true do
     local args2 = {
         1000003
     }
+    -- ENSURE EnterCityRaidMap is READY before firing
     Remotes:WaitForChild("EnterCityRaidMap"):FireServer(unpack(args2))
 
-    -- CRITICAL SAFETY WAIT: Wait 5 seconds for the client to stabilize after siege entry
-    wait(5)
 
     -- Action 3: Wait 600 seconds before teleporting to World 11
     print("Teleported. Waiting 600 seconds before teleporting to World 11...")
@@ -45,6 +43,7 @@ while true do
             mapId = 50011
         }
     }
+    -- ENSURE LocalPlayerTeleport is READY before firing
     Remotes:WaitForChild("LocalPlayerTeleport"):FireServer(unpack(args3))
 
     -- The loop will now repeat from the beginning
